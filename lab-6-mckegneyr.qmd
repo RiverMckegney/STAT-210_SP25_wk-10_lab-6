@@ -1,3 +1,10 @@
+---
+title: STAT210_SP25 Lab 6 Childcare Costs in California
+author: River Mckegney
+date: today
+format: html
+---
+
 ## The Data
 
 In this lab we're going look at the median weekly cost of childcare in
@@ -9,7 +16,10 @@ The data come to us from [TidyTuesday](https://github.com/rfordatascience/tidytu
 
 ```{r}
 #| label: setup
+#| echo: true
 
+library(dplyr)
+library(readr) # For read_csv function
 ```
 
 ```{r}
@@ -41,9 +51,10 @@ Let's start by focusing only on California.
 
 ```{r}
 #| label: recoding-county-to-census-regions
+#| eval: false
 
-ca_childcare <- ca_childcare |> 
-  mutate(county_name = str_remove(county_name, " County")) |> 
+ca_childcare <- ca_childcare |>
+  mutate(county_name = str_remove(county_name, " County")) |>
   mutate(region = fct_______(county_name,
     'Superior California' = c("Butte", "Colusa", "El Dorado". ...),
      ...
@@ -55,6 +66,7 @@ ca_childcare <- ca_childcare |>
 
 ```{r}
 #| label: median-income-by-region-over-time
+#| eval: true
 # Hint: You will want to calculate the median of median income before you make columns for 2008/2018 by transforming the data
 
 
@@ -67,6 +79,7 @@ ca_childcare <- ca_childcare |>
 
 ```{r}
 #| label: lowest-median-weekly-price-2018
+#| eval: true
 
 
 ```
@@ -76,7 +89,13 @@ ca_childcare <- ca_childcare |>
 
 ```{r}
 #| label: recreate-plot
+#| eval: true
 
 ```
 
 
+# Data Sources:
+
+1. Data Science Learning Community (2024). Tidy Tuesday: A weekly social data project. https://tidytues.day <https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-05-09/readme.md>
+
+2. United States Department of Labor. Women's Bureau. National Database of Childcare Prices. <https://www.dol.gov/agencies/wb/topics/featured-childcare>
