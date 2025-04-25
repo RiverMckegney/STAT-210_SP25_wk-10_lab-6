@@ -60,15 +60,15 @@ Let's start by focusing only on California.
 #| label: ca-childcare-costs
 #| echo: true
 
+# Merged dataframe
 location_childcare_merged <- counties %>% 
   inner_join(y = childcare_costs, by = "county_fips_code")
 
-location_childcare_merged %>%
+# Dataframe of selected variables
+ca_childcare <- location_childcare_merged %>%
   filter(state_name == "California") %>%
-  select(county_fips_code, study_year, mhi_2018, mcsa, mfccsa, mc_infant, mc_toddler, mc_preschool, mfcc_infant, mfcc_toddler, mfcc_preschool) %>%
-  filter()
+  select(county_name, study_year, mhi_2018, mcsa, mfccsa, mc_infant, mc_toddler, mc_preschool, mfcc_infant, mfcc_toddler, mfcc_preschool) 
 
-# ca_childcare <- 
 ```
 
 **3. Using a function from the `forcats` package, complete the code below to create a new variable where each county is categorized into one of the [10 Census regions](https://census.ca.gov/regions/) in California. Use the Region description (from the plot), not the Region number. An example region has been started for you.**  
