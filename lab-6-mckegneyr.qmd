@@ -2,7 +2,9 @@
 title: STAT210_SP25 Lab 6 Childcare Costs in California
 author: River Mckegney
 date: today
-format: html
+format:
+  html:
+    code-fold: show
 ---
 
 ## The Data
@@ -17,6 +19,7 @@ The data come to us from [TidyTuesday](https://github.com/rfordatascience/tidytu
 ```{r}
 #| label: setup
 #| echo: true
+#| output: false
 
 library(dplyr)
 library(readr) # For read_csv function
@@ -24,13 +27,26 @@ library(readr) # For read_csv function
 
 ```{r}
 #| label: load-data
+#| echo: true
+#| code-fold: false
+                                                                                   
+options(readr.show_col_types = FALSE)                                                #<1>
 
 childcare_costs <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-09/childcare_costs.csv')
 
 counties <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-05-09/counties.csv')
+
+#spec(counties) # View col types
+#spec(childcare_costs) # View col types
 ```
+1. Source used to hide output warning: <https://github.com/tidyverse/readr/issues/1250>
 
 **1. Briefly describe the dataset (~ 4 sentences). What information does it contain?**
+
+Question 1 Response By River Mckegney:
+
+The 'childcare_costs' dataset contains information about individuals such as unemployment rates at various ages, employment rates by gender and age, income, population size, ethnic background, family size, occupational field, and other demographic data as well as its associated location and date data.
+The 'counties' dataset contains state and county data information. Note this data contains location data from various states and not just California.
 
 ## California Childcare Costs
 
@@ -99,3 +115,8 @@ ca_childcare <- ca_childcare |>
 1. Data Science Learning Community (2024). Tidy Tuesday: A weekly social data project. https://tidytues.day <https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-05-09/readme.md>
 
 2. United States Department of Labor. Women's Bureau. National Database of Childcare Prices. <https://www.dol.gov/agencies/wb/topics/featured-childcare>
+
+# References:
+1. Github. Problem with options(readr.show_col_types = FALSE) #1250. <https://github.com/tidyverse/readr/issues/1250>
+
+
