@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="River Mckegney">
-<meta name="dcterms.date" content="2025-04-25">
+<meta name="dcterms.date" content="2025-05-08">
 
 <title>STAT210_SP25 Lab 6 Childcare Costs in California</title>
 <style>
@@ -98,7 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 25, 2025</p>
+      <p class="date">May 8, 2025</p>
     </div>
   </div>
   
@@ -116,11 +116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The data come to us from <a href="https://github.com/rfordatascience/tidytuesday">TidyTuesday</a>.</p>
 <p><strong>0. Load the appropriate libraries and the data.</strong></p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co"># For read_csv function</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="annotated-cell-2"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-2-1" class="code-annotation-target"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">readr.show_col_types =</span> <span class="cn">FALSE</span>)</span>
@@ -150,8 +146,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>2. Create a <code>ca_childcare</code> dataset of childcare costs in California, containing (1) county information and (2) just the year and childcare cost variable information from the <code>childcare_costs</code> dataset.</strong></p>
 <p><em>Hint: There are 58 counties in CA and 11 years in the dataset. Therefore, your new dataset should have 53 x 11 = 638 observations. The final data set should have study year, median household income expressed in 2018 dollars, all the variables associated with full-time median price charged for Center-based Care, and California county names</em></p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merged dataframe</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>location_childcare_merged <span class="ot">&lt;-</span> counties <span class="sc">%&gt;%</span> </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="at">y =</span> childcare_costs, <span class="at">by =</span> <span class="st">"county_fips_code"</span>)</span>
@@ -160,27 +154,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ca_childcare <span class="ot">&lt;-</span> location_childcare_merged <span class="sc">%&gt;%</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state_name <span class="sc">==</span> <span class="st">"California"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county_name, study_year, mhi_2018, mcsa, mfccsa, mc_infant, mc_toddler, mc_preschool, mfcc_infant, mfcc_toddler, mfcc_preschool) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p><strong>3. Using a function from the <code>forcats</code> package, complete the code below to create a new variable where each county is categorized into one of the <a href="https://census.ca.gov/regions/">10 Census regions</a> in California. Use the Region description (from the plot), not the Region number. An example region has been started for you.</strong></p>
 <p><em>Hint: This is probably a good place to use ChatGPT to reduce on tedious work. But you do need to know how to prompt ChatGPT to make it useful!</em></p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ca_childcare <span class="ot">&lt;-</span> ca_childcare <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">county_name =</span> <span class="fu">str_remove</span>(county_name, <span class="st">" County"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="fu">fct_______</span>(county_name,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Superior California'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Butte"</span>, <span class="st">"Colusa"</span>, <span class="st">"El Dorado"</span>. ...),</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>     ...</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="annotated-cell-4"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a>ca_childcare <span class="ot">&lt;-</span> ca_childcare <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-4-2"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">county_name =</span> <span class="fu">str_remove</span>(county_name, <span class="st">" County"</span>)) <span class="sc">|&gt;</span> <span class="co"># Remove the word 'county' from all variable names within the county_name column</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2" onclick="event.preventDefault();" href="">2</a><span id="annotated-cell-4-3" class="code-annotation-target"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="fu">fct_collapse</span>(county_name,</span>
+<span id="annotated-cell-4-4"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Superior California'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Butte"</span>, <span class="st">"Colusa"</span>, <span class="st">"El Dorado"</span>, <span class="st">"Glenn"</span>, <span class="st">"Lassen"</span>, <span class="st">"Modoc"</span>, <span class="st">"Nevada"</span>, <span class="st">"Placer"</span>, <span class="st">"Plumas"</span>, <span class="st">"Sacramento"</span>, <span class="st">"Shasta"</span>, <span class="st">"Sierra"</span>, <span class="st">"Siskiyou"</span>, <span class="st">"Sutter"</span>, <span class="st">"Tehama"</span>, <span class="st">"Yolo"</span>, <span class="st">"Yuba"</span>),</span>
+<span id="annotated-cell-4-5"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'North Coast'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Del Norte"</span>, <span class="st">"Humboldt"</span>, <span class="st">"Lake"</span>, <span class="st">"Mendocino"</span>, <span class="st">"Napa"</span>, <span class="st">"Sonoma"</span>, <span class="st">"Trinity"</span>), </span>
+<span id="annotated-cell-4-6"><a href="#annotated-cell-4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'San Francisco Bay Area'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Alameda"</span>, <span class="st">"Contra Costa"</span>, <span class="st">"Marin"</span>, <span class="st">"San Francisco"</span>, <span class="st">"San Mateo"</span>, <span class="st">"Santa Clara"</span>, <span class="st">"Solano"</span>),</span>
+<span id="annotated-cell-4-7"><a href="#annotated-cell-4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Northern San Joaquin Valley'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Alpine"</span>, <span class="st">"Amador"</span>, <span class="st">"Calaveras"</span>, <span class="st">"Madera"</span>, <span class="st">"Mariposa"</span>, <span class="st">"Merced"</span>, <span class="st">"Mono"</span>, <span class="st">"San Joaquin"</span>, <span class="st">"Stanislaus"</span>, <span class="st">"Tuolumne"</span>),</span>
+<span id="annotated-cell-4-8"><a href="#annotated-cell-4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Central Coast'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Monterey"</span>, <span class="st">"San Benito"</span>, <span class="st">"San Luis Obispo"</span>, <span class="st">"Santa Barbara"</span>, <span class="st">"Santa Cruz"</span>, <span class="st">"Ventura"</span>),</span>
+<span id="annotated-cell-4-9"><a href="#annotated-cell-4-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Southern San Joaquin Valley'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Fresno"</span>, <span class="st">"Inyo"</span>, <span class="st">"Kern"</span>, <span class="st">"Kings"</span>, <span class="st">"Tulare"</span>),</span>
+<span id="annotated-cell-4-10"><a href="#annotated-cell-4-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Inland Empire'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Riverside"</span>, <span class="st">"San Bernardino"</span>),</span>
+<span id="annotated-cell-4-11"><a href="#annotated-cell-4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Los Angeles County'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Los Angeles"</span>),</span>
+<span id="annotated-cell-4-12"><a href="#annotated-cell-4-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Orange County'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Orange"</span>),</span>
+<span id="annotated-cell-4-13"><a href="#annotated-cell-4-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'San Diego - Imperial'</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Imperial"</span>, <span class="st">"San Diego"</span>))) <span class="co"># Create new col 'region' that sorts names into new groupings based on the 10 census region description names</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="3" data-code-annotation="2">Reference used to find forcats function required to carry out code script in its given format. <a href="https://forcats.tidyverse.org/reference/index.html" class="uri">https://forcats.tidyverse.org/reference/index.html</a></span>
+</dd>
+</dl>
+</div>
 </div>
 <p><strong>4. Let’s consider the median household income of each region, and how that income has changed over time. Create a table with ten rows, one for each region, and two columns, one for 2008 and one for 2018. The cells should contain the <code>median</code> of the median household income (expressed in 2018 dollars) of the <code>region</code> and the <code>study_year</code>. Arrange the rows by 2018 values.</strong></p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: You will want to calculate the median of median income before you make columns for 2008/2018 by transforming the data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: You will want to calculate the median of median income before you make columns for 2008/2018 by transforming the data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>5. Which California <code>region</code> had the lowest <code>median</code> full-time median weekly price for center-based childcare for infants in 2018? Does this <code>region</code> correspond to the <code>region</code> with the lowest <code>median</code> income in 2018 that you found in Q4?</strong></p>
 <p><em>Hint: The code should give me the EXACT answer. This means having the code output the exact row(s) and variable(s) necessary for providing the solution. Consider the <code>slice()</code> functions.</em></p>
@@ -196,7 +198,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="references" class="level1">
 <h1>References:</h1>
 <ol type="1">
-<li>Github. Problem with options(readr.show_col_types = FALSE) #1250. <a href="https://github.com/tidyverse/readr/issues/1250" class="uri">https://github.com/tidyverse/readr/issues/1250</a></li>
+<li><p>Github. Problem with options(readr.show_col_types = FALSE) #1250. <a href="https://github.com/tidyverse/readr/issues/1250" class="uri">https://github.com/tidyverse/readr/issues/1250</a></p></li>
+<li><p>Wickham H and Posit (2023). Forcats, “Function reference”. <a href="https://forcats.tidyverse.org/reference/index.html" class="uri">https://forcats.tidyverse.org/reference/index.html</a></p></li>
 </ol>
 </section>
 

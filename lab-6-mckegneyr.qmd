@@ -2,9 +2,7 @@
 title: STAT210_SP25 Lab 6 Childcare Costs in California
 author: River Mckegney
 date: today
-format:
-  html:
-    code-fold: show
+format: html
 ---
 
 ## The Data
@@ -21,14 +19,14 @@ The data come to us from [TidyTuesday](https://github.com/rfordatascience/tidytu
 #| echo: true
 #| output: false
 
-library(dplyr)
-library(readr) # For read_csv function
+library(tidyverse)
 ```
 
 ```{r}
 #| label: load-data
 #| echo: true
-#| code-fold: false
+#| output: true
+#| eval: true
                                                                                    
 options(readr.show_col_types = FALSE)                                                #<1>
 
@@ -59,6 +57,8 @@ Let's start by focusing only on California.
 ```{r}
 #| label: ca-childcare-costs
 #| echo: true
+#| output: true
+#| eval: true
 
 # Merged dataframe
 location_childcare_merged <- counties %>% 
@@ -77,16 +77,26 @@ ca_childcare <- location_childcare_merged %>%
 
 ```{r}
 #| label: recoding-county-to-census-regions
-#| eval: false
+#| echo: true
+#| output: true
+#| eval: true
 
 ca_childcare <- ca_childcare |>
-  mutate(county_name = str_remove(county_name, " County")) |>
-  mutate(region = fct_______(county_name,
-    'Superior California' = c("Butte", "Colusa", "El Dorado". ...),
-     ...
-    ))
-```
+  mutate(county_name = str_remove(county_name, " County")) |> # Remove the word 'county' from all variable names within the county_name column
+  mutate(region = fct_collapse(county_name,                                          # <2>
+    'Superior California' = c("Butte", "Colusa", "El Dorado", "Glenn", "Lassen", "Modoc", "Nevada", "Placer", "Plumas", "Sacramento", "Shasta", "Sierra", "Siskiyou", "Sutter", "Tehama", "Yolo", "Yuba"),
+    'North Coast' = c("Del Norte", "Humboldt", "Lake", "Mendocino", "Napa", "Sonoma", "Trinity"), 
+    'San Francisco Bay Area' = c("Alameda", "Contra Costa", "Marin", "San Francisco", "San Mateo", "Santa Clara", "Solano"),
+    'Northern San Joaquin Valley' = c("Alpine", "Amador", "Calaveras", "Madera", "Mariposa", "Merced", "Mono", "San Joaquin", "Stanislaus", "Tuolumne"),
+    'Central Coast' = c("Monterey", "San Benito", "San Luis Obispo", "Santa Barbara", "Santa Cruz", "Ventura"),
+    'Southern San Joaquin Valley' = c("Fresno", "Inyo", "Kern", "Kings", "Tulare"),
+    'Inland Empire' = c("Riverside", "San Bernardino"),
+    'Los Angeles County' = c("Los Angeles"),
+    'Orange County' = c("Orange"),
+    'San Diego - Imperial' = c("Imperial", "San Diego"))) # Create new col 'region' that sorts names into new groupings based on the 10 census region description names
 
+```
+2. Reference used to find forcats function required to carry out code script in its given format. <https://forcats.tidyverse.org/reference/index.html>
 
 **4. Let's consider the median household income of each region, and how that income has changed over time. Create a table with ten rows, one for each region, and two columns, one for 2008 and one for 2018. The cells should contain the `median` of the median household income (expressed in 2018 dollars) of the `region` and the `study_year`. Arrange the rows by 2018 values.**
 
@@ -129,4 +139,5 @@ ca_childcare <- ca_childcare |>
 # References:
 1. Github. Problem with options(readr.show_col_types = FALSE) #1250. <https://github.com/tidyverse/readr/issues/1250>
 
+2. Wickham H and Posit (2023). Forcats, "Function reference".  <https://forcats.tidyverse.org/reference/index.html>
 
