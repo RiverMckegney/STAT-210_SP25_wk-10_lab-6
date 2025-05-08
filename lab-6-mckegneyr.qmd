@@ -105,7 +105,12 @@ ca_childcare <- ca_childcare |>
 #| eval: true
 # Hint: You will want to calculate the median of median income before you make columns for 2008/2018 by transforming the data
 
-
+# River's code
+ca_childcare |>
+  group_by(region, study_year) |>
+  summarize(med_income = median(mhi_2018)) |>
+  filter(study_year == 2018 | study_year == 2008) |>
+  arrange(desc(med_income))
 ```
 
 

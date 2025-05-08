@@ -182,7 +182,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><strong>4. Let’s consider the median household income of each region, and how that income has changed over time. Create a table with ten rows, one for each region, and two columns, one for 2008 and one for 2018. The cells should contain the <code>median</code> of the median household income (expressed in 2018 dollars) of the <code>region</code> and the <code>study_year</code>. Arrange the rows by 2018 values.</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: You will want to calculate the median of median income before you make columns for 2008/2018 by transforming the data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hint: You will want to calculate the median of median income before you make columns for 2008/2018 by transforming the data</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># River's code</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ca_childcare <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(region, study_year) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">med_income =</span> <span class="fu">median</span>(mhi_2018)) <span class="sc">|&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(study_year <span class="sc">==</span> <span class="dv">2018</span> <span class="sc">|</span> study_year <span class="sc">==</span> <span class="dv">2008</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(med_income))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'region'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 3
+# Groups:   region [10]
+   region                      study_year med_income
+   &lt;fct&gt;                            &lt;dbl&gt;      &lt;dbl&gt;
+ 1 San Francisco Bay Area            2018    104552 
+ 2 San Francisco Bay Area            2008     90412.
+ 3 Orange County                     2008     86452.
+ 4 Orange County                     2018     85398 
+ 5 Central Coast                     2018     74849 
+ 6 Central Coast                     2008     72979 
+ 7 Inland Empire                     2008     65977.
+ 8 Los Angeles County                2018     64251 
+ 9 Los Angeles County                2008     63471.
+10 Inland Empire                     2018     62056 
+11 San Diego - Imperial              2018     60344.
+12 Northern San Joaquin Valley       2008     59108.
+13 San Diego - Imperial              2008     58201.
+14 Superior California               2008     57831.
+15 Northern San Joaquin Valley       2018     57769 
+16 Superior California               2018     53270 
+17 Southern San Joaquin Valley       2008     52676.
+18 Southern San Joaquin Valley       2018     52479 
+19 North Coast                       2008     47862.
+20 North Coast                       2018     45528 </code></pre>
+</div>
 </div>
 <p><strong>5. Which California <code>region</code> had the lowest <code>median</code> full-time median weekly price for center-based childcare for infants in 2018? Does this <code>region</code> correspond to the <code>region</code> with the lowest <code>median</code> income in 2018 that you found in Q4?</strong></p>
 <p><em>Hint: The code should give me the EXACT answer. This means having the code output the exact row(s) and variable(s) necessary for providing the solution. Consider the <code>slice()</code> functions.</em></p>
