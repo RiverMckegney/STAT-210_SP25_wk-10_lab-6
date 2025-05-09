@@ -122,8 +122,16 @@ ca_childcare |>
 #| label: lowest-median-weekly-price-2018
 #| eval: true
 
-
+ca_childcare |> 
+  group_by(region, study_year) |>
+  summarize(med_price_CBC = median(mc_infant)) |>
+  filter(study_year == 2018) |>
+  arrange(med_price_CBC)
+  
 ```
+River's response to Q5:
+> Superior California is the region that displays the lowest median full time median weekly price for center based childcare for infants during 2018. This does not quite match up with the region that showed the lowest median household income, from question 5 which was the North Coast. Though Superior California did followed closely behind, with a generally low median household income in 2018 of $53270.00 when compared to all other regions.
+
 
 **6. Recreate the plot (look at online instructions) that shows, for all ten regions, the change over time of the full-time median price for center-based childcare for infants, toddlers, and preschoolers. Recreate the plot. You do not have to replicate the exact colors or theme, but your plot should have the same content, including the order of the facets and legend, reader-friendly labels, axes breaks, and a  smooth function.**
 
