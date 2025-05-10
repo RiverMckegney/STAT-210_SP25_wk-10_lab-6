@@ -19,7 +19,9 @@ The data come to us from [TidyTuesday](https://github.com/rfordatascience/tidytu
 #| echo: true
 #| output: false
 
-library(tidyverse)
+library(tidyverse) # Forcats functions and more
+library(lubridate) # Timeseries functions
+#library(hms) # Timeseries fucntions
 ```
 
 ```{r}
@@ -133,24 +135,54 @@ River's response to Q5:
 > Superior California is the region that displays the lowest median full time median weekly price for center based childcare for infants during 2018. This does not quite match up with the region that showed the lowest median household income, from question 5 which was the North Coast. Though Superior California did followed closely behind, with a generally low median household income in 2018 of $53270.00 when compared to all other regions.
 
 
-**6. Recreate the plot (look at online instructions) that shows, for all ten regions, the change over time of the full-time median price for center-based childcare for infants, toddlers, and preschoolers. Recreate the plot. You do not have to replicate the exact colors or theme, but your plot should have the same content, including the order of the facets and legend, reader-friendly labels, axes breaks, and a  smooth function.**
+**6. Recreate the plot (look at online instructions) that shows, for all ten regions, the change over time of the full-time median price for center-based childcare for infants, toddlers, and preschoolers. Recreate the plot. You do not have to replicate the exact colors or theme, but your plot should have the same content, including the order of the facets and legend, reader-friendly labels, axes breaks, and a smooth function.**
 
 
 ```{r}
 #| label: recreate-plot
+#| echo: true
+#| output: true
 #| eval: true
 
-```
+ca_childcare |>
+  select(study_year, county_name, mc_infant, mc_toddler, mc_preschool, region) |>
+#  mutate(study_year = years(study_year)) |>
+  pivot_longer(cols = starts_with("mc_"),
+               names_to = "childcare_youth_type", 
+               values_to = "med_center_childcare_value") |>                          # <3>
+  mutate(childcare_youth_type = fct_recode(childcare_youth_type, 
+                                           "Infant" = "mc_infant",                  # <4>
+                                           "Toddler" = "mc_toddler",                
+                                           "Preschool" = "mc_preschool")) |>
+#  mutate(med_center_childcare_value = as.factor(med_center_childcare_value)) |>
+  ggplot() +
+  geom_point(aes(x = study_year, y = med_center_childcare_value, color = region)) +
+  geom_smooth(aes(x = study_year, y = med_center_childcare_value, color = region)) +
+  scale_y_continuous(breaks = c(100, 200, 300, 400, 500)) +
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
+  facet_wrap(~ childcare_youth_type) +
+  labs(title = "Weekly Median Price For Center Based Childcare In CA",
+       x = "Study Year",
+       y = "Weekly Median Center Based Price Of Childcare ($)") +
+  theme(legend.position = "bottom")
+#  theme_grey()
 
+```
+3. Source used to reference forcat's fct_recode function formatting: <https://forcats.tidyverse.org/reference/fct_recode.html>.
+4. Reference used as troubleshoot that reminded me the order to specify naming, as fct_recode(column, "new_name" = "old_name"). <https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>
 
 # Data Sources:
 
-1. Data Science Learning Community (2024). Tidy Tuesday: A weekly social data project. https://tidytues.day <https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-05-09/readme.md>
+1. Data Science Learning Community (2024). Tidy Tuesday: A weekly social data project. https://tidytues.day <https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-05-09/readme.md>.
 
-2. United States Department of Labor. Women's Bureau. National Database of Childcare Prices. <https://www.dol.gov/agencies/wb/topics/featured-childcare>
+2. United States Department of Labor. Women's Bureau. National Database of Childcare Prices. <https://www.dol.gov/agencies/wb/topics/featured-childcare>.
 
 # References:
-1. Github. Problem with options(readr.show_col_types = FALSE) #1250. <https://github.com/tidyverse/readr/issues/1250>
+1. Github. Problem with options(readr.show_col_types = FALSE) #1250. <https://github.com/tidyverse/readr/issues/1250>.
 
-2. Wickham H and Posit (2023). Forcats, "Function reference".  <https://forcats.tidyverse.org/reference/index.html>
+2. Wickham H and Posit (2023). Forcats, "Function reference".  <https://forcats.tidyverse.org/reference/index.html>.
+
+3. Wickham H and Posit (2023). Forcats, "Change factor levels by hand". Source code: <https://github.com/tidyverse/forcats/blob/HEAD/R/recode.R>. website url: <https://forcats.tidyverse.org/reference/fct_recode.html>.
+
+4. Stackoverflow. "changing variable name in box plot using fct_recode". Last modified 2021-04-22. <https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>.
 
