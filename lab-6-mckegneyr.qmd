@@ -2,7 +2,7 @@
 title: STAT210_SP25 Lab 6 Childcare Costs in California
 author: River Mckegney
 date: today
-format: html
+format: md
 ---
 
 ## The Data
@@ -21,7 +21,7 @@ The data come to us from [TidyTuesday](https://github.com/rfordatascience/tidytu
 
 library(tidyverse) # Forcats functions and more
 library(lubridate) # Timeseries functions
-#library(hms) # Timeseries fucntions
+library(ggh4x) # Adjust facet panel sizing
 ```
 
 ```{r}
@@ -143,21 +143,23 @@ River's response to Q5:
 #| echo: true
 #| output: true
 #| eval: true
+#| code-fold: true
 
+# River's First Attempt, Working Draft
 
 ca_childcare |>
   select(study_year, county_name, mc_infant, mc_toddler, mc_preschool, region) |> # Select cols used
   pivot_longer(cols = starts_with("mc_"), # Merge three numerical cols into one, select cols by "mc_"
                names_to = "childcare_youth_type", # Move three categorical vars into a col
                values_to = "med_center_childcare_value") |> # Move all numerical values into another col
-  mutate(childcare_youth_type = fct_recode(childcare_youth_type,    # <3>
-                                           "Infant" = "mc_infant",  # <4>
+  mutate(childcare_youth_type = fct_recode(childcare_youth_type,                     # <3>
+                                           "Infant" = "mc_infant",                   # <4>
                                            "Toddler" = "mc_toddler",                
                                            "Preschool" = "mc_preschool")) |> # Change names of categorical col variables into simple description for graph 
   ggplot() + 
   geom_point(aes(x = study_year, y = med_center_childcare_value, color = region)) +
   geom_smooth(aes(x = study_year, y = med_center_childcare_value, color = region)) + 
-  facet_wrap(~ fct_reorder(childcare_youth_type, med_center_childcare_value)) +  # <5> 
+  facet_wrap(~ fct_reorder(childcare_youth_type, med_center_childcare_value)) +       # <5> 
                                                                                  # Facet numerical values by categorical col
   labs(title = "Weekly Median Price For Center Based Childcare In CA",
        x = "Study Year",
@@ -167,11 +169,49 @@ ca_childcare |>
   scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) + # Set x-axis year tick marks
   scale_color_viridis_d() 
 
+```
+
+
+```{r}
+#| label: recreate-plot-2
+#| echo: true
+#| output: true
+#| eval: true
+
+# Rivers Finished Graph
+
+ca_childcare |>
+  select(study_year, county_name, mc_infant, mc_toddler, mc_preschool, region) |> # Select cols used
+  pivot_longer(cols = starts_with("mc_"), # Merge three numerical cols into one, select cols by "mc_"
+               names_to = "childcare_youth_type", # Move three categorical vars into a col
+               values_to = "med_center_childcare_value") |> # Move all numerical values into another col
+  mutate(childcare_youth_type = fct_recode(childcare_youth_type,                     # <3>
+                                           "Infant" = "mc_infant",                   # <4>
+                                           "Toddler" = "mc_toddler",                
+                                           "Preschool" = "mc_preschool")) |> # Change names of categorical col variables into simple description for graph 
+  mutate(region = fct_reorder(region, med_center_childcare_value, .desc = TRUE)) |>
+  ggplot() + 
+  geom_point(aes(x = study_year, y = med_center_childcare_value, color = region)) +
+  geom_smooth(aes(x = study_year, y = med_center_childcare_value, color = region)) + 
+  facet_grid(~ factor(childcare_youth_type, c("Infant", "Toddler", "Preschool"))) +  # <6>   
+                                                                                     # Facet numerical values by categorical col
+  labs(title = "Weekly Median Price For Center Based Childcare In CA",
+       x = "Study Year",
+       y = "Weekly Median Center Based Price Of Childcare ($)") +
+  theme(legend.position = "right", legend.text = element_text(size = 6),
+       panel.spacing = unit(.5, "cm"), axis.text.x.bottom = element_text(size = 7)) + # Adjust legend position text size & overall size, distance between facet panels, and timeline tick text size
+  guides(color = guide_legend(title = "California Region")) +
+  scale_y_continuous(limits = c(100, 500)) + # Set y-axis value range & tick marks
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) + # Set x-axis year tick marks
+  scale_color_viridis_d(option = "magma")
 
 ```
 3. Source used to reference forcat's fct_recode function formatting: <https://forcats.tidyverse.org/reference/fct_recode.html>.
 4. Reference used as troubleshoot that reminded me the order to specify naming, as fct_recode(column, "new_name" = "old_name"). <https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>.
 5. Reference used to utilize fct_reorder: <https://mpn.metworx.com/packages/forcats/0.5.0/reference/fct_reorder.html>.
+6. Alternative method to custom set order of facet: <https://forum.posit.co/t/re-ordering-facet-wrap/141999/2>.
+
+
 
 # Data Sources:
 
@@ -190,3 +230,4 @@ ca_childcare |>
 
 5. Forcats. Developed by Hadley Wickham, Rstudio. "Reorder factor levels by sorting along another variable". Source code: <https://github.com/tidyverse/forcats/blob/main/R/reorder.R>. Webpage html url: <https://mpn.metworx.com/packages/forcats/0.5.0/reference/fct_reorder.html>.
 
+6. Posit Community. "Re-ordering facet_wrap". <https://forum.posit.co/t/re-ordering-facet-wrap/141999/2>.
