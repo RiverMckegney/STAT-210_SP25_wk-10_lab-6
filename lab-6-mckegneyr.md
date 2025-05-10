@@ -200,7 +200,7 @@ facets and legend, reader-friendly labels, axes breaks, and a smooth
 function.**
 
 ``` r
-# Rivers Finished Graph
+# River's First Attempt, Working Draft
 
 ca_childcare |>
   select(study_year, county_name, mc_infant, mc_toddler, mc_preschool, region) |> # Select cols used
@@ -209,6 +209,51 @@ ca_childcare |>
                values_to = "med_center_childcare_value") |> # Move all numerical values into another col
   mutate(childcare_youth_type = fct_recode(childcare_youth_type,
                                            "Infant" = "mc_infant",
+                                           "Toddler" = "mc_toddler",                
+                                           "Preschool" = "mc_preschool")) |> # Change names of categorical col variables into simple description for graph 
+  ggplot() + 
+  geom_point(aes(x = study_year, y = med_center_childcare_value, color = region)) +
+  geom_smooth(aes(x = study_year, y = med_center_childcare_value, color = region)) + 
+  facet_wrap(~ fct_reorder(childcare_youth_type, med_center_childcare_value)) +
+                                                                                 # Facet numerical values by categorical col
+  labs(title = "Weekly Median Price For Center Based Childcare In CA",
+       x = "Study Year",
+       y = "Weekly Median Center Based Price Of Childcare ($)") +
+  theme(legend.position = "bottom", legend.text = element_text(size = 6)) + # Adjust legend position & size
+  scale_y_continuous(limits = c(100, 500)) + # Set y-axis value range & tick marks
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) + # Set x-axis year tick marks
+  scale_color_viridis_d() 
+```
+
+Line 8  
+Source used to reference forcat’s fct_recode function formatting:
+<https://forcats.tidyverse.org/reference/fct_recode.html>.
+
+Line 9  
+Reference used as troubleshoot that reminded me the order to specify
+naming, as fct_recode(column, “new_name” = “old_name”).
+<https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>.
+
+Line 15  
+Reference used to utilize fct_reorder:
+<https://mpn.metworx.com/packages/forcats/0.5.0/reference/fct_reorder.html>.
+
+<!-- -->
+
+    `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+![](lab-6-mckegneyr.markdown_strict_files/figure-markdown_strict/recreate-plot-1.png)
+
+``` r
+# Rivers Finished Graph
+
+ca_childcare |>
+  select(study_year, county_name, mc_infant, mc_toddler, mc_preschool, region) |> # Select cols used
+  pivot_longer(cols = starts_with("mc_"), # Merge three numerical cols into one, select cols by "mc_"
+               names_to = "childcare_youth_type", # Move three categorical vars into a col
+               values_to = "med_center_childcare_value") |> # Move all numerical values into another col
+  mutate(childcare_youth_type = fct_recode(childcare_youth_type,                     
+                                           "Infant" = "mc_infant",                   
                                            "Toddler" = "mc_toddler",                
                                            "Preschool" = "mc_preschool")) |> # Change names of categorical col variables into simple description for graph 
   mutate(region = fct_reorder(region, med_center_childcare_value, .desc = TRUE)) |>
@@ -227,15 +272,6 @@ ca_childcare |>
   scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) + # Set x-axis year tick marks
   scale_color_viridis_d(option = "magma")
 ```
-
-Line 8  
-Source used to reference forcat’s fct_recode function formatting:
-<https://forcats.tidyverse.org/reference/fct_recode.html>.
-
-Line 9  
-Reference used as troubleshoot that reminded me the order to specify
-naming, as fct_recode(column, “new_name” = “old_name”).
-<https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>.
 
 Line 16  
 Alternative method to custom set order of facet:
