@@ -144,32 +144,34 @@ River's response to Q5:
 #| output: true
 #| eval: true
 
+
 ca_childcare |>
-  select(study_year, county_name, mc_infant, mc_toddler, mc_preschool, region) |>
-#  mutate(study_year = years(study_year)) |>
-  pivot_longer(cols = starts_with("mc_"),
-               names_to = "childcare_youth_type", 
-               values_to = "med_center_childcare_value") |>                          # <3>
-  mutate(childcare_youth_type = fct_recode(childcare_youth_type, 
-                                           "Infant" = "mc_infant",                  # <4>
+  select(study_year, county_name, mc_infant, mc_toddler, mc_preschool, region) |> # Select cols used
+  pivot_longer(cols = starts_with("mc_"), # Merge three numerical cols into one, select cols by "mc_"
+               names_to = "childcare_youth_type", # Move three categorical vars into a col
+               values_to = "med_center_childcare_value") |> # Move all numerical values into another col
+  mutate(childcare_youth_type = fct_recode(childcare_youth_type,    # <3>
+                                           "Infant" = "mc_infant",  # <4>
                                            "Toddler" = "mc_toddler",                
-                                           "Preschool" = "mc_preschool")) |>
-#  mutate(med_center_childcare_value = as.factor(med_center_childcare_value)) |>
-  ggplot() +
+                                           "Preschool" = "mc_preschool")) |> # Change names of categorical col variables into simple description for graph 
+  ggplot() + 
   geom_point(aes(x = study_year, y = med_center_childcare_value, color = region)) +
-  geom_smooth(aes(x = study_year, y = med_center_childcare_value, color = region)) +
-  scale_y_continuous(breaks = c(100, 200, 300, 400, 500)) +
-  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) +
-  facet_wrap(~ childcare_youth_type) +
+  geom_smooth(aes(x = study_year, y = med_center_childcare_value, color = region)) + 
+  facet_wrap(~ fct_reorder(childcare_youth_type, med_center_childcare_value)) +  # <5> 
+                                                                                 # Facet numerical values by categorical col
   labs(title = "Weekly Median Price For Center Based Childcare In CA",
        x = "Study Year",
        y = "Weekly Median Center Based Price Of Childcare ($)") +
-  theme(legend.position = "bottom")
-#  theme_grey()
+  theme(legend.position = "bottom", legend.text = element_text(size = 6)) + # Adjust legend position & size
+  scale_y_continuous(limits = c(100, 500)) + # Set y-axis value range & tick marks
+  scale_x_continuous(breaks = c(2008, 2010, 2012, 2014, 2016, 2018)) + # Set x-axis year tick marks
+  scale_color_viridis_d() 
+
 
 ```
 3. Source used to reference forcat's fct_recode function formatting: <https://forcats.tidyverse.org/reference/fct_recode.html>.
-4. Reference used as troubleshoot that reminded me the order to specify naming, as fct_recode(column, "new_name" = "old_name"). <https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>
+4. Reference used as troubleshoot that reminded me the order to specify naming, as fct_recode(column, "new_name" = "old_name"). <https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>.
+5. Reference used to utilize fct_reorder: <https://mpn.metworx.com/packages/forcats/0.5.0/reference/fct_reorder.html>.
 
 # Data Sources:
 
@@ -185,4 +187,6 @@ ca_childcare |>
 3. Wickham H and Posit (2023). Forcats, "Change factor levels by hand". Source code: <https://github.com/tidyverse/forcats/blob/HEAD/R/recode.R>. website url: <https://forcats.tidyverse.org/reference/fct_recode.html>.
 
 4. Stackoverflow. "changing variable name in box plot using fct_recode". Last modified 2021-04-22. <https://stackoverflow.com/questions/67197228/changing-variable-name-in-box-plot-using-fct-recode>.
+
+5. Forcats. Developed by Hadley Wickham, Rstudio. "Reorder factor levels by sorting along another variable". Source code: <https://github.com/tidyverse/forcats/blob/main/R/reorder.R>. Webpage html url: <https://mpn.metworx.com/packages/forcats/0.5.0/reference/fct_reorder.html>.
 
